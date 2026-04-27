@@ -1,13 +1,12 @@
-FROM golang:1.22.5 AS base
-WORKDIR /app
-COPY go.mod ./
-RUN go mod download
-COPY . .
-RUN go build -o main .
+FROM gcr.io/distroless/static-debian12 AS runner
 
-FROM gcr.io/distroless/base as final
 WORKDIR /app
-COPY --from=base /app/main .
-COPY --from=base /app/static ./static
+
+COPY --chown=nonroot:nonroot --chmod=755 ./my-go-app /app/main
+COPY --chown=nonroot:nonroot ./static /app/static
+
 EXPOSE 8080
-CMD ["./main"]
+
+USER nonroot:nonroot
+
+CMD ["/app/main"]
