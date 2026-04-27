@@ -1,15 +1,12 @@
-FROM golang:1.20-alpine as base
-WORKDIR /app
-COPY go.mod .
-RUN go mod download
-COPY . .
-RUN go build -o main .
+FROM gcr.io/distroless/static-debian12 AS runner
 
-FROM gcr.io/distroless/base as runner
 WORKDIR /app
-RUN adduser -D -u 1000 appuser && chown -R appuser:appuser /app
-COPY --from=base /app/main .
-COPY --from=base /app/static ./static
+
+COPY --chown=nonroot:nonroot /app/main ./main
+COPY --chown=nonroot:nonroot /app/static ./static
+
 EXPOSE 8080
-USER appuser
-CMD ["/main"]
+
+USER nonroot:nonroot
+
+CMD ["/app/main"]
