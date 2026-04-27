@@ -1,12 +1,13 @@
-FROM gcr.io/distroless/static-debian12 AS runner
-
+FROM golang:1.21 as base
 WORKDIR /app
+COPY go.mod ./
+RUN go mod download
+COPY . .
+RUN go build -o main .
 
-COPY --chown=nonroot:nonroot --chmod=755 ./my-go-app /app/main
-COPY --chown=nonroot:nonroot ./static /app/static
-
+FROM gcr.io/distroless/base
+WORKDIR /app
+COPY --from=base /app/main .
+COPY --from=base /app/static ./static
 EXPOSE 8080
-
-USER nonroot:nonroot
-
-CMD ["/app/main"]
+CMD ["./main"]
