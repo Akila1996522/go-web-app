@@ -58,4 +58,5 @@ jobs:
 
     - name: Tag and push Docker image
       run: |
-        docker tag my-go-app $IMA
+        docker tag my-go-app $IMAGE_NAME
+        docker push $IMAGE_NAME
