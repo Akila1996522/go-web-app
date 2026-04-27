@@ -2,8 +2,8 @@ FROM gcr.io/distroless/static-debian12 AS runner
 
 WORKDIR /app
 
-COPY --chown=nonroot:nonroot /app/main ./main
-COPY --chown=nonroot:nonroot /app/static ./static
+COPY --chown=nonroot:nonroot ./my-go-app ./main
+COPY --chown=nonroot:nonroot ./static ./static
 
 EXPOSE 8080
 
