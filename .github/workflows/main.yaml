@@ -47,16 +47,15 @@ jobs:
     - name: Build Docker image
       run: docker build -t my-go-app .
 
-    - name: Push github container registry
-      run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+    - name: Login to GitHub Container Registry
+      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
-    - name: Set lowercase repo name
-      run: echo "REPO_NAME=$(echo ${{ github.event.repository.name }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
-    
+    - name: Set lowercase image name
+      run: |
+        OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+        REPO=$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')
+        echo "IMAGE_NAME=ghcr.io/$OWNER/$REPO:latest" >> $GITHUB_ENV
+
     - name: Tag and push Docker image
       run: |
-        docker tag my-go-app ghcr.io/${{ github.repository_owner }}/${{ env.REPO_NAME }}:latest
-        docker push ghcr.io/${{ github.repository_owner }}/${{ env.REPO_NAME }}:latest
-    
-    - name: Logout from github container registry
-      run: docker logout ghcr.io
+        docker tag my-go-app $IMA
