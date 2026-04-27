@@ -51,10 +51,12 @@ jobs:
       run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
     - name: transform github repo capital name to simple name
-      run: echo "REPO_NAME=$(echo ${{ github.repository }} | awk -F/ '{print tolower($2)}')" >> $GITHUB_ENV
+      run: echo "REPO_NAME=$(echo ${{ github.repository_owner }} | awk -F/ '{print tolower($2)}')" >> $GITHUB_ENV
+    
     - name: Tag and push Docker image to github container registry
       run: |
         docker tag my-go-app ghcr.io/${{ github.repository_owner }}/${{ env.REPO_NAME }}:latest
         docker push ghcr.io/${{ github.repository_owner }}/${{ env.REPO_NAME }}:latest
+    
     - name: Logout from github container registry
       run: docker logout ghcr.io
